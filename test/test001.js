@@ -10,38 +10,38 @@
  * - a board with a valid firmata.ino firmware connected
  * 
  * description step:
- * - call <constructor()> of RelayJs class
+ * - call <constructor()> of Board class
  * - call <requestPort()> method
  * - call <connect(port.path)> method with port received by requestPort() method
  * - get <firmata> property
  * - get <connected> property
  */
 
-const{RelayJs, Firmata, Serialport} = require('../relayjs');
+const{Board, Firmata, Serialport} = require('../board');
 
 
 let main = async () => {
   try {
     console.log(`--- TEST START ---`)
 
-    console.log("call <constructor()> of RelayJs class")
-    const relayjs = new RelayJs();
+    console.log("call <constructor()> of Board class")
+    const board = new Board();
 
     console.log("call <requestPort()> method")
-    let port = await relayjs.requestPort();
+    let port = await board.requestPort();
     console.log(port)
 
     console.log(`call <connect(${port.path})> method with port received by requestPort() method`);
-    const res = await relayjs.connect(port.path);
+    const res = await board.connect(port.path);
     console.log(res);
 
     console.log("get <firmata> property");
-    console.log(relayjs.firmata)
+    console.log(board.firmata)
 
     console.log("get <connected> property");
-    console.log(relayjs.connected)
+    console.log(board.connected)
 
-    console.log(`--- TEST PASSED: ${relayjs.connected} ---`)
+    console.log(`--- TEST PASSED: ${board.connected} ---`)
     console.log(`--- TEST END ---`)
   } catch (e) {
     console.log(e.message)

@@ -11,47 +11,44 @@
  * - nothing connected
  *
  * description step:
- * - call <constructor()> of RelayJs class
+ * - call <constructor()> of Board class
  * - listen on <error> event
  * - call <connect()> method with undefined port
  * - get <firmata> property
  * - get <connected> property
  */
 
-const { RelayJs, Firmata, Serialport } = require("../relayjs");
+const { Board, Firmata, Serialport } = require("../board");
 const {wait} = require("./utils")
 
 let main = async () => {
-  let relayjs = undefined;
+  let board = undefined;
   try {
     console.log(`--- TEST START ---`);
 
-    console.log("call <constructor()> of RelayJs class");
-    relayjs = new RelayJs();
+    console.log("call <constructor()> of Board class");
+    board = new Board();
 
     console.log("listen on <error> event");
-    relayjs.on("error", (e)=> {
+    board.on("error", (e)=> {
       console.log(e)
     })
 
     console.log("call connect() with undefined port");
-    const res = await relayjs.connect();
+    const res = await board.connect();
     console.log(res);
 
   } catch (e) {
-    console.log(e.message);
+    console.log(e);
   }
 
-  console.log("wait 1000 ms");
-  await wait(1000);
-
   console.log("get <firmata> property");
-  console.log(relayjs.firmata);
+  console.log(board.firmata);
 
   console.log("get <connected> property");
-  console.log(relayjs.connected);
+  console.log(board.connected);
   
-  console.log(`--- TEST PASSED: ${!relayjs.connected} ---`);
+  console.log(`--- TEST PASSED: ${!board.connected} ---`);
   console.log(`--- TEST END ---`);
 };
 
