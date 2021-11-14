@@ -14,53 +14,56 @@ class Board extends EventEmitter {
     this.__onError = this.__onError.bind(this);
   }
 
-  get serialportInstance(){
-    if (! (this.firmata instanceof Firmata) && !(this.firmata.transport instanceof Serialport) ) {
+  get serialportInstance() {
+    if (
+      !(this.firmata instanceof Firmata) &&
+      !(this.firmata.transport instanceof Serialport)
+    ) {
       return undefined;
     }
-    return this.firmata.transport
+    return this.firmata.transport;
   }
 
-  get connected(){
-    if (! (this.firmata instanceof Firmata) ) {
+  get connected() {
+    if (!(this.firmata instanceof Firmata)) {
       return false;
     }
-    return this.firmata.versionReceived && this.firmata.isReady
+    return this.firmata.versionReceived && this.firmata.isReady;
   }
 
-  get port(){
+  get port() {
     return this.serialportInstance.path;
   }
 
-  get pins(){
-    if (! (this.firmata instanceof Firmata) ) {
+  get pins() {
+    if (!(this.firmata instanceof Firmata)) {
       return undefined;
     }
     return this.firmata.pins;
   }
 
-  get MODES(){
-    if (! (this.firmata instanceof Firmata) ) {
+  get MODES() {
+    if (!(this.firmata instanceof Firmata)) {
       return undefined;
     }
     return this.firmata.MODES;
   }
 
-  get HIGH(){
-    if (! (this.firmata instanceof Firmata) ) {
+  get HIGH() {
+    if (!(this.firmata instanceof Firmata)) {
       return undefined;
     }
     return this.firmata.HIGH;
   }
 
-  get LOW(){
-    if (! (this.firmata instanceof Firmata) ) {
+  get LOW() {
+    if (!(this.firmata instanceof Firmata)) {
       return undefined;
     }
     return this.firmata.LOW;
   }
 
-  __onDisconnect(){
+  __onDisconnect() {
     this.firmata = undefined;
     this.emit("error", {
       type: "DISCONNECTED",
@@ -69,7 +72,7 @@ class Board extends EventEmitter {
     });
   }
 
-  __onClose(){
+  __onClose() {
     this.firmata = undefined;
     this.emit("error", {
       type: "CLOSE",
@@ -78,7 +81,7 @@ class Board extends EventEmitter {
     });
   }
 
-  __onError(e){
+  __onError(e) {
     this.firmata = undefined;
     this.emit("error", {
       type: "ERROR",
@@ -87,39 +90,39 @@ class Board extends EventEmitter {
     });
   }
 
-  async requestPort(){
-    return new Promise((res, rej)=> {
+  async requestPort() {
+    return new Promise((res, rej) => {
       Firmata.requestPort((e, port) => {
-        e ? rej(e) : res(port)
-      })
-    })
+        e ? rej(e) : res(port);
+      });
+    });
   }
 
   async connect(port, options) {
     return new Promise((res, rej) => {
       try {
         this.firmata = new Firmata(port, options);
-        this.firmata.on("ready", ()=> {
-          res(true)
-        })
-        this.firmata.on("disconnect", this.__onDisconnect)
-        this.firmata.on("close", this.__onClose)
-        this.firmata.on("error", this.__onError)
+        this.firmata.on("ready", () => {
+          res(true);
+        });
+        this.firmata.on("disconnect", this.__onDisconnect);
+        this.firmata.on("close", this.__onClose);
+        this.firmata.on("error", this.__onError);
       } catch (e) {
         this.firmata = undefined;
-        rej('Connection Failed. Check the hardware configuration');
+        rej("Connection Failed. Check the hardware configuration");
       }
     });
   }
 
   async disconnect() {
     return new Promise((res, rej) => {
-      if(! (this.firmata instanceof Firmata)){
+      if (!(this.firmata instanceof Firmata)) {
         res(true);
       }
-      this.firmata.off("disconnect", this.__onDisconnect)
-      this.firmata.off("close", this.__onClose)
-      this.firmata.off("error", this.__onError)
+      this.firmata.off("disconnect", this.__onDisconnect);
+      this.firmata.off("close", this.__onClose);
+      this.firmata.off("error", this.__onError);
       this.firmata.transport.close((e) => {
         this.firmata = undefined;
         e ? rej(e) : res(true);
@@ -127,54 +130,22 @@ class Board extends EventEmitter {
     });
   }
 
-  //it is possible to check when an async command is executed.
-  //you have to check when this.firmata.pending change.
-  //in particular, when pinMode() start this.firmata.pending = x + 1
-  //when finish, this.firmata.pending = x
-  //you can use rxjs?
-  async pinMode(pin, mode){
-    return new Promise( async(res, rej) => {
-      try {
-        this.firmata.pinMode(pin, mode);
-        res(true);
-      } catch (e) {
-        rej(`pinMode() failed. Details: ${e.message}`)
-      }
-    })
+  pinMode(pin, mode) {
+    try {
+      this.firmata.pinMode(pin, mode);
+    } catch (e) {
+      throw `pinMode() failed. Details: ${e.message}`;
+    }
   }
 
-  //it is possible to check when an async command is executed.
-  //you have to check when this.firmata.pending change.
-  //in particular, when pinMode() start this.firmata.pending = x + 1
-  //when finish, this.firmata.pending = x
-  //you can use rxjs?
-  async digitalWrite(pin, value){
-    return new Promise( async(res, rej) => {
-      try {
-        this.firmata.digitalWrite(pin, value);
-        res(true);
-      } catch (e) {
-        rej(`digitalWrite() failed. Details: ${e.message}`)
-      }
-    })
-  }
-
-  //it is possible to check when an async command is executed.
-  //you have to check when this.firmata.pending change.
-  //in particular, when pinMode() start this.firmata.pending = x + 1
-  //when finish, this.firmata.pending = x
-  //you can use rxjs?
-  async reset(){
-    return new Promise( async(res, rej) => {
-      try {
-        this.firmata.reset();
-        res(true);
-      } catch (e) {
-        rej(`reset() failed. Details: ${e.message}`)
-      }
-    })
+  digitalWrite(pin, value) {
+    try {
+      this.firmata.digitalWrite(pin, value);
+    } catch (e) {
+      throw `digitalWrite() failed. Details: ${e.message}`;
+    }
   }
 
 }
 
-module.exports = {Board, Firmata, Serialport}
+module.exports = { Board, Firmata, Serialport };

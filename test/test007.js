@@ -1,10 +1,10 @@
 /**
- * test001.js
+ * test007.js
  *
  * scope of test:
- * Verify that when the board with a valid firmware is connected,
- * the module establish a connection to board.
- * Check also the internal status of module after connection
+ * Verify the functionallity of pinMode()/digitalWrite()
+ * Connect the board, set pin 13 as output using pinMode()
+ * then set the value to 1 using digitalWrite()
  *
  * prerequisites:
  * - a board with a valid firmata.ino firmware connected
@@ -38,22 +38,14 @@ let main = async () => {
     console.log(res);
 
     console.log(`call <pinMode(13, board.MODES.OUTPUT)> method`);
-    await board.pinMode(13, board.MODES.OUTPUT);
+    board.pinMode(13, board.MODES.OUTPUT);
     console.log(`call <digitalWrite(13, board.HIGH)> method`);
-    await board.digitalWrite(13, board.HIGH);
+    board.digitalWrite(13, board.HIGH);
 
-		console.log(board.firmata);
+		console.log("get <pins[13]> property");
+		console.log(board.pins[13]);
 
-		console.log("wait 5000..");
-		await wait(5000);
-
-		console.log('call reset() method');
-		await board.reset();
-
-		console.log(board.firmata);
-
-
-    console.log(`--- TEST PASSED: ${board.connected} ---`);
+    console.log(`--- TEST PASSED: ${board.pins[13].value === board.HIGH} ---`);
     console.log(`--- TEST END ---`);
   } catch (e) {
     console.log(e);
