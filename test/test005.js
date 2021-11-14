@@ -1,11 +1,12 @@
 /**
- * test004.js
+ * test005.js
  *
  * scope of test:
- * While the board is connected, verify that
- * if a user disconnect it from the usb port,
- * raise an error and it's possibile to connect again
- * Check also the internal status in both case
+ * Verify the functionallity of disconnect method.
+ * First connect the board with connect() method, 
+ * check the internal status then disconnect the board
+ * with disconnect() method and check the internal
+ * status again
  * 
  * prerequisites:
  * - a board with a valid firmata.ino firmware connected
@@ -16,12 +17,9 @@
  * - listen on <error> event
  * - call <requestPort()> method
  * - call <connect(${port.path})> method with port received by requestPort() method
- * - Tester: Disconnect the board. Wait 10000 ms..
  * - get <firmata> property
  * - get <connected> property
- * - Tester: Connect the board. Wait 10000 ms..
- * - call <requestPort()> method
- * - call <connect(${port.path})> method with port received by requestPort() method
+ * - call <disconnect()> method
  * - get <firmata> property
  * - get <connected> property
  */
@@ -51,8 +49,15 @@
      let res = await relayjs.connect(port.path);
      console.log(res);
 
-     console.log("Tester: Disconnect the board. Wait 10000 ms..");
-     await wait(10000);
+     console.log("get <firmata> property");
+     console.log(relayjs.firmata);
+
+     console.log("get <connected> property");
+     console.log(relayjs.connected);
+
+     console.log("call <disconnect()> method")
+     res = await relayjs.disconnect();
+     console.log(res)
 
      console.log("get <firmata> property");
      console.log(relayjs.firmata);
@@ -60,24 +65,7 @@
      console.log("get <connected> property");
      console.log(relayjs.connected);
 
-     console.log("Tester: Connect the board. Wait 10000 ms..");
-     await wait(10000);
-
-     console.log("call <requestPort()> method")
-     port = await relayjs.requestPort();
-     console.log(port)
-
-     console.log(`call <connect(${port.path})> method with port received by requestPort() method`);
-     res = await relayjs.connect(port.path);
-     console.log(res);
-
-     console.log("get <firmata> property");
-     console.log(relayjs.firmata);
-
-     console.log("get <connected> property");
-     console.log(relayjs.connected);
-
-     console.log(`--- TEST PASSED: ${relayjs.connected} ---`);
+     console.log(`--- TEST PASSED: ${!relayjs.connected} ---`);
      console.log(`--- TEST END ---`);
 
    } catch (e) {

@@ -1,5 +1,5 @@
 /**
- * test001.js
+ * test002.js
  *
  * scope of test:
  * verify that when the board is disconnected,
@@ -25,26 +25,32 @@ let main = async () => {
   let relayjs = undefined;
   try {
     console.log(`--- TEST START ---`);
+
     console.log("call <constructor()> of RelayJs class");
     relayjs = new RelayJs();
+
     console.log("listen on <error> event");
     relayjs.on("error", (e)=> {
       console.log(e)
     })
-    console.log(
-      "call connect() with undefined port"
-    );
+
+    console.log("call connect() with undefined port");
     const res = await relayjs.connect();
     console.log(res);
+
   } catch (e) {
     console.log(e.message);
   }
+
   console.log("wait 1000 ms");
   await wait(1000);
+
   console.log("get <firmata> property");
   console.log(relayjs.firmata);
+
   console.log("get <connected> property");
   console.log(relayjs.connected);
+  
   console.log(`--- TEST PASSED: ${!relayjs.connected} ---`);
   console.log(`--- TEST END ---`);
 };
