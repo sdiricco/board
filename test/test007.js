@@ -11,6 +11,7 @@
  *
  * description step:
  * - call <constructor()> of Board class
+ * - listen on <error> event
  * - call <requestPort()> method
  * - call <connect(port.path)> method with port received by requestPort() method
  * - get <firmata> property
@@ -26,6 +27,11 @@ let main = async () => {
 
     console.log("call <constructor()> of Board class");
     const board = new Board();
+
+		console.log("listen on <error> event");
+    board.on("error", (e) => {
+      console.log(e);
+    });
 
     console.log("call <requestPort()> method");
     let port = await board.requestPort();

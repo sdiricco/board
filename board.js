@@ -14,7 +14,7 @@ class Board extends EventEmitter {
     this.__onError = this.__onError.bind(this);
   }
 
-  get serialportInstance() {
+  get serialport() {
     if (
       !(this.firmata instanceof Firmata) &&
       !(this.firmata.transport instanceof Serialport)
@@ -32,7 +32,7 @@ class Board extends EventEmitter {
   }
 
   get port() {
-    return this.serialportInstance.path;
+    return this.serialport.path;
   }
 
   get pins() {
