@@ -43,6 +43,9 @@ let main = async () => {
     const res = await board.connect(port.path);
     console.log(res);
 
+    console.log(board.pins)
+
+
     console.log(`call <pinMode(13, board.MODES.OUTPUT)> method`);
     board.pinMode(13, board.MODES.OUTPUT);
     console.log(`call <digitalWrite(13, board.HIGH)> method`);
@@ -50,6 +53,10 @@ let main = async () => {
 
 		console.log("get <pins[13]> property");
 		console.log(board.pins[13]);
+
+    await board.reset();
+    console.log(board.firmata.pending);
+    console.log(board.pins)
 
     console.log(`--- TEST PASSED: ${board.pins[13].value === board.HIGH} ---`);
     console.log(`--- TEST END ---`);

@@ -2,16 +2,25 @@ const Firmata = require("firmata");
 const Serialport = require("serialport");
 const EventEmitter = require("events");
 
+let wait = (t_ms) => {
+  return new Promise(res => setTimeout(()=> res(true), t_ms))
+}
+
 class Board extends EventEmitter {
   constructor() {
     super();
     this.firmata = undefined;
 
-    this.connect = this.connect.bind(this);
-    this.disconnect = this.disconnect.bind(this);
     this.__onDisconnect = this.__onDisconnect.bind(this);
     this.__onClose = this.__onClose.bind(this);
     this.__onError = this.__onError.bind(this);
+    this.requestPort = this.requestPort.bind(this);
+    this.connect = this.connect.bind(this);
+    this.disconnect = this.disconnect.bind(this);
+    this.autoConnect = this.autoConnect.bind(this);
+    this.pinMode = this.pinMode.bind(this);
+    this.digitalWrite = this.digitalWrite.bind(this);
+    this.digitalRead = this.digitalRead.bind(this);
   }
 
   get serialport() {
@@ -130,6 +139,33 @@ class Board extends EventEmitter {
     });
   }
 
+  async reset() {
+    return new Promise(async (res, rej) => {
+      setTimeout(() => {
+        rej('reset() failed. Details: TIMEOUT EXPIRED');
+      }, 1000);
+      for (let pin = 0; pin < this.pins.length; pin++) {
+        this.pinMode(pin, this.MODES.UNKOWN);
+        this.digitalWrite(pin, this.LOW, true);
+      }
+      this.firmata.flushDigitalPorts();
+      while (this.firmata.pending) {
+        await wait(1);
+      }
+      res(true);
+    });
+  }
+
+  async autoConnect() {
+    try {
+      const port = await this.requestPort();
+      await this.connect(port.path);
+      return true;
+    } catch (e) {
+      throw `autoConnect() failed. ${e.message}`;
+    }
+  }
+
   pinMode(pin, mode) {
     try {
       this.firmata.pinMode(pin, mode);
@@ -138,14 +174,23 @@ class Board extends EventEmitter {
     }
   }
 
-  digitalWrite(pin, value) {
+  digitalWrite(pin, value, enqueue) {
     try {
-      this.firmata.digitalWrite(pin, value);
+      this.firmata.digitalWrite(pin, value, enqueue);
     } catch (e) {
       throw `digitalWrite() failed. Details: ${e.message}`;
     }
   }
 
+  async digitalRead(pin) {
+    return new Promise((res, rej) => {
+      try {
+        this.firmata.digitalRead(pin, (value) => res(value));
+      } catch (e) {
+        rej(`digitalRead() failed. Details: ${e.message}`);
+      }
+    });
+  }
 }
 
 module.exports = { Board, Firmata, Serialport };
