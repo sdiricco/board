@@ -43,25 +43,29 @@ let main = async () => {
     const res = await board.connect(port.path);
     console.log(res);
 
-    console.log(board.pins)
+    // console.log(board.pins)
 
 
     console.log(`call <pinMode(13, board.MODES.OUTPUT)> method`);
-    board.pinMode(13, board.MODES.OUTPUT);
+    await board.pinMode(13, board.MODES.OUTPUT);
+    console.log(board.firmata.pending);
+
     console.log(`call <digitalWrite(13, board.HIGH)> method`);
-    board.digitalWrite(13, board.HIGH);
+    await board.digitalWrite(13, board.HIGH);
+    console.log(board.firmata.pending);
+
 
 		console.log("get <pins[13]> property");
 		console.log(board.pins[13]);
 
-    await board.reset();
+     await board.reset();
     console.log(board.firmata.pending);
-    console.log(board.pins)
+    // console.log(board.pins)
 
     console.log(`--- TEST PASSED: ${board.pins[13].value === board.HIGH} ---`);
     console.log(`--- TEST END ---`);
   } catch (e) {
-    console.log(e);
+    console.log(e.message);
   }
 };
 

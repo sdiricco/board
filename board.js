@@ -2,6 +2,8 @@ const Firmata = require("firmata");
 const Serialport = require("serialport");
 const EventEmitter = require("events");
 
+const TIMEOUT_EXEC_PROM = 5;
+
 let wait = (t_ms) => {
   return new Promise(res => setTimeout(()=> res(true), t_ms))
 }
@@ -14,6 +16,7 @@ class Board extends EventEmitter {
     this.__onDisconnect = this.__onDisconnect.bind(this);
     this.__onClose = this.__onClose.bind(this);
     this.__onError = this.__onError.bind(this);
+    this.execProm = this.execProm.bind(this);
     this.requestPort = this.requestPort.bind(this);
     this.connect = this.connect.bind(this);
     this.disconnect = this.disconnect.bind(this);
@@ -99,6 +102,24 @@ class Board extends EventEmitter {
     });
   }
 
+  async execProm(__function, timeout = TIMEOUT_EXEC_PROM){
+    return new Promise(async (res, rej) => {
+      setTimeout(() => {
+        rej(new Error('TIMEOUT EXPIRED'));
+      }, timeout);
+      try {
+        __function()
+        this.firmata.flushDigitalPorts(); 
+      } catch (e) {
+        rej(e);
+      }
+      while (this.firmata.pending) {
+        await wait(1);
+      }
+      res(true);
+    });
+  }
+
   async requestPort() {
     return new Promise((res, rej) => {
       Firmata.requestPort((e, port) => {
@@ -140,20 +161,17 @@ class Board extends EventEmitter {
   }
 
   async reset() {
-    return new Promise(async (res, rej) => {
-      setTimeout(() => {
-        rej('reset() failed. Details: TIMEOUT EXPIRED');
-      }, 1000);
-      for (let pin = 0; pin < this.pins.length; pin++) {
-        this.pinMode(pin, this.MODES.UNKOWN);
-        this.digitalWrite(pin, this.LOW, true);
-      }
-      this.firmata.flushDigitalPorts();
-      while (this.firmata.pending) {
-        await wait(1);
-      }
-      res(true);
-    });
+    try {
+      await this.execProm(()=>{
+        for (let pin = 0; pin < this.pins.length; pin++) {
+          this.pinMode(pin, this.MODES.UNKOWN);
+          this.digitalWrite(pin, this.LOW, true);
+        }
+      })
+    } catch (e) {
+      throw new Error(`reset() failed. Details: ${e.message}`)
+    }
+
   }
 
   async autoConnect() {
@@ -166,19 +184,23 @@ class Board extends EventEmitter {
     }
   }
 
-  pinMode(pin, mode) {
+  async pinMode(pin, mode) {
     try {
-      this.firmata.pinMode(pin, mode);
+      await this.execProm(()=>{
+        this.firmata.pinMode(pin, mode);
+      })
     } catch (e) {
-      throw `pinMode() failed. Details: ${e.message}`;
+      throw new Error(`pinMode() failed. Details: ${e}`)
     }
   }
 
-  digitalWrite(pin, value, enqueue) {
+  async digitalWrite(pin, value, enqueue) {
     try {
-      this.firmata.digitalWrite(pin, value, enqueue);
+      await this.execProm(()=>{
+        this.firmata.digitalWrite(pin, value, enqueue);
+      })
     } catch (e) {
-      throw `digitalWrite() failed. Details: ${e.message}`;
+      throw new Error(`digitalWrite() failed. Details: ${e.message}`)
     }
   }
 
