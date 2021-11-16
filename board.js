@@ -167,7 +167,7 @@ class Board extends EventEmitter {
           this.pinMode(pin, this.MODES.UNKOWN);
           this.digitalWrite(pin, this.LOW, true);
         }
-      })
+      }, 50)
     } catch (e) {
       throw new Error(`reset() failed. Details: ${e.message}`)
     }
