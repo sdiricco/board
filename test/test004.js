@@ -27,7 +27,7 @@
  * - get <connected> property
  */
 
- const { Board, Firmata, Serialport } = require("../board");
+ const { Board, Firmata, Serialport } = require("../boardjs");
  const {wait} = require("./utils")
  
  let main = async () => {

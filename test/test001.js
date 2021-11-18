@@ -18,7 +18,7 @@
  * - get <connected> property
  */
 
-const{Board, Firmata, Serialport} = require('../board');
+const{Board, Firmata, Serialport} = require('../boardjs');
 
 
 let main = async () => {
