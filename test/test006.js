@@ -1,5 +1,5 @@
 /**
- * test005.js
+ * test006.js
  *
  * scope of test:
  * Verify the functionallity of connect/disconnect method.
