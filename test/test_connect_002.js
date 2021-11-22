@@ -1,10 +1,8 @@
 /**
- * test001.js
  * 
  * scope of test:
- * Verify that when the board with a valid firmware is connected,
- * the module establish a connection to board.
- * Check also the internal status of module after connection
+ * Verify the functionallity of connect() method
+ * passing a valid port
  * 
  * prerequisites:
  * - a board with a valid firmata.ino firmware connected
@@ -13,12 +11,12 @@
  * - call <constructor()> of Board class
  * - listen on <error> event
  * - call <requestPort()> method
- * - call <connect(port.path)> method with port received by requestPort() method
+ * - call <connect({port: port.path})> method with port received by requestPort() method
  * - get <firmata> property
  * - get <connected> property
  */
 
-const{Board, Firmata, Serialport} = require('../boardjs');
+const{Board} = require('../index');
 
 
 let main = async () => {
@@ -37,8 +35,8 @@ let main = async () => {
     let port = await board.requestPort();
     console.log(port)
 
-    console.log(`call <connect(${port.path})> method with port received by requestPort() method`);
-    const res = await board.connect(port.path);
+    console.log(`call <connect({port: ${port.path}})> method with port received by requestPort() method`);
+    const res = await board.connect({port: port.path});
     console.log(res);
 
     console.log("get <firmata> property");
@@ -50,7 +48,7 @@ let main = async () => {
     console.log(`--- TEST PASSED: ${board.connected} ---`)
     console.log(`--- TEST END ---`)
   } catch (e) {
-    console.log(e.message)
+    console.log(e)
   }
 }
 

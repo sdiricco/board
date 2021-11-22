@@ -5,8 +5,8 @@ const EventEmitter = require("events");
 const TIMEOUT_EXEC_PROM = 5;
 
 let wait = (t_ms) => {
-  return new Promise(res => setTimeout(()=> res(true), t_ms))
-}
+  return new Promise((res) => setTimeout(() => res(true), t_ms));
+};
 
 class Board extends EventEmitter {
   constructor() {
@@ -20,7 +20,6 @@ class Board extends EventEmitter {
     this.requestPort = this.requestPort.bind(this);
     this.connect = this.connect.bind(this);
     this.disconnect = this.disconnect.bind(this);
-    this.autoConnect = this.autoConnect.bind(this);
     this.pinMode = this.pinMode.bind(this);
     this.digitalWrite = this.digitalWrite.bind(this);
     this.digitalRead = this.digitalRead.bind(this);
@@ -102,14 +101,14 @@ class Board extends EventEmitter {
     });
   }
 
-  async execProm(__function, timeout = TIMEOUT_EXEC_PROM){
+  async execProm(__function, timeout = TIMEOUT_EXEC_PROM) {
     return new Promise(async (res, rej) => {
       setTimeout(() => {
-        rej(new Error('TIMEOUT EXPIRED'));
+        rej(new Error("TIMEOUT EXPIRED"));
       }, timeout);
       try {
-        __function()
-        this.firmata.flushDigitalPorts(); 
+        __function();
+        this.firmata.flushDigitalPorts();
       } catch (e) {
         rej(e);
       }
@@ -128,10 +127,22 @@ class Board extends EventEmitter {
     });
   }
 
-  async connect(port, options) {
-    return new Promise((res, rej) => {
+  async connect({ port = undefined, options = undefined } = {}) {
+    return new Promise(async(res, rej) => {
       try {
-        this.firmata = new Firmata(port, options);
+
+        let __port = undefined;
+
+        //find a valid port
+        if (port === undefined) {
+          const portInfo = await this.requestPort();
+          __port = portInfo.path;
+        }
+        else{
+          __port = port;
+        }
+
+        this.firmata = new Firmata(__port, options);
         this.firmata.on("ready", () => {
           res(true);
         });
@@ -162,45 +173,34 @@ class Board extends EventEmitter {
 
   async reset() {
     try {
-      await this.execProm(()=>{
+      await this.execProm(() => {
         for (let pin = 0; pin < this.pins.length; pin++) {
           this.pinMode(pin, this.MODES.UNKOWN);
           this.digitalWrite(pin, this.LOW, true);
         }
-      }, 50)
+      }, 50);
     } catch (e) {
-      throw new Error(`reset() failed. Details: ${e.message}`)
-    }
-
-  }
-
-  async autoConnect() {
-    try {
-      const port = await this.requestPort();
-      await this.connect(port.path);
-      return true;
-    } catch (e) {
-      throw `autoConnect() failed. ${e.message}`;
+      throw(`reset failed. Details: ${e.message}`);
     }
   }
 
   async pinMode(pin, mode) {
     try {
-      await this.execProm(()=>{
+      await this.execProm(() => {
         this.firmata.pinMode(pin, mode);
-      })
+      });
     } catch (e) {
-      throw new Error(`pinMode() failed. Details: ${e}`)
+      throw new Error(`pinMode() failed. Details: ${e}`);
     }
   }
 
   async digitalWrite(pin, value, enqueue) {
     try {
-      await this.execProm(()=>{
+      await this.execProm(() => {
         this.firmata.digitalWrite(pin, value, enqueue);
-      })
+      });
     } catch (e) {
-      throw new Error(`digitalWrite() failed. Details: ${e.message}`)
+      throw new Error(`digitalWrite() failed. Details: ${e.message}`);
     }
   }
 

@@ -2,24 +2,21 @@
  * test002.js
  *
  * scope of test:
- * verify that when the board is disconnected,
- * the module raise an error during the connection
- * Check also the internal status of module
+ * Verify the functionallity of connect() method
+ * passing a not valid port
  * 
  * prerequisites:
- * - a board with a valid firmata.ino firmware disconnected or
- * - nothing connected
+ * - a board with a valid firmata.ino firmware connected
  *
  * description step:
  * - call <constructor()> of Board class
  * - listen on <error> event
- * - call <connect()> method with undefined port
+ * - call <connect({port: "unknow"})> method with with invalid port
  * - get <firmata> property
  * - get <connected> property
  */
 
-const { Board, Firmata, Serialport } = require("../boardjs");
-const {wait} = require("./utils")
+const{Board} = require('../index');
 
 let main = async () => {
   let board = undefined;
@@ -34,8 +31,8 @@ let main = async () => {
       console.log(e)
     })
 
-    console.log("call connect() with undefined port");
-    const res = await board.connect();
+    console.log(`call <connect({port: "unknow" })> method with with invalid port`);
+    const res = await board.connect({port: "unknow"});
     console.log(res);
 
   } catch (e) {
