@@ -3,7 +3,7 @@
  *
  * scope of test:
  * Verify the functionallity of connect() method
- * passing a not valid port
+ * passing a invalid port parameter
  * 
  * prerequisites:
  * - a board with a valid firmata.ino firmware connected

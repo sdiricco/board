@@ -15,15 +15,11 @@ const { Board } = require("@sdiricco/boardjs");
 
 let main = async () => {
   try {
-      
     const board = new Board();
-
     board.on("error", (e) => {
       console.log(e);
     });
-
     await board.connect();
-
   } catch (e) {
     console.log(e);
   }

@@ -1,5 +1,5 @@
 const Firmata = require("firmata");
-const Serialport = require("serialport");
+const SerialPort = require("serialport");
 const EventEmitter = require("events");
 
 const TIMEOUT_EXEC_PROM = 5;
@@ -26,13 +26,10 @@ class Board extends EventEmitter {
   }
 
   get serialport() {
-    if (
-      !(this.firmata instanceof Firmata) &&
-      !(this.firmata.transport instanceof Serialport)
-    ) {
-      return undefined;
+    if (this.firmata instanceof Firmata && this.firmata.transport) {
+      return this.firmata.transport;
     }
-    return this.firmata.transport;
+    return undefined;
   }
 
   get connected() {
@@ -43,7 +40,10 @@ class Board extends EventEmitter {
   }
 
   get port() {
-    return this.serialport.path;
+    if (this.serialport) {
+      return this.serialport.path;
+    }
+    return undefined;
   }
 
   get pins() {
@@ -128,8 +128,24 @@ class Board extends EventEmitter {
   }
 
   async connect({ port = undefined, options = undefined } = {}) {
-    return new Promise(async(res, rej) => {
+    return new Promise(async (res, rej) => {
       try {
+        //if already connected return with success only if is called
+        //in auto-connect mode or if the port is the same connected
+        if (this.connected) {
+          //auto-connect mode
+          if (port === undefined) {
+            res(true);
+            return;
+          }
+          //if the port is the same
+          if (port === this.port) {
+            res(true);
+            return;
+          }
+          rej(`Connection Failed. Already connected on ${this.port}`);
+          return;
+        }
 
         let __port = undefined;
 
@@ -137,14 +153,14 @@ class Board extends EventEmitter {
         if (port === undefined) {
           const portInfo = await this.requestPort();
           __port = portInfo.path;
-        }
-        else{
+        } else {
           __port = port;
         }
 
         this.firmata = new Firmata(__port, options);
         this.firmata.on("ready", () => {
           res(true);
+          return;
         });
         this.firmata.on("disconnect", this.__onDisconnect);
         this.firmata.on("close", this.__onClose);
@@ -152,6 +168,7 @@ class Board extends EventEmitter {
       } catch (e) {
         this.firmata = undefined;
         rej("Connection Failed. Check the hardware configuration");
+        return;
       }
     });
   }
@@ -180,7 +197,7 @@ class Board extends EventEmitter {
         }
       }, 50);
     } catch (e) {
-      throw(`reset failed. Details: ${e.message}`);
+      throw `reset failed. Details: ${e.message}`;
     }
   }
 
@@ -215,4 +232,4 @@ class Board extends EventEmitter {
   }
 }
 
-module.exports = { Board, Firmata, Serialport };
+module.exports = { Board, Firmata, SerialPort };

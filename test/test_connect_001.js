@@ -1,8 +1,8 @@
 /**
  * 
  * scope of test:
- * Verify tthe autoconnect functionallity of connect()
- * method.
+ * Verify the functionallity of connect() method
+ * in auto-connect mode
  * 
  * prerequisites:
  * - a board with a valid firmata.ino firmware connected
@@ -10,7 +10,7 @@
  * description step:
  * - call <constructor()> of Board class
  * - listen on <error> event
- * - call <connect()> method with no parameters. autoconnect mode.
+ * - call <connect()> method with no parameters. auto-connect mode.
  * - get <firmata> property
  * - get <connected> property
  */
