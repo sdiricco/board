@@ -127,40 +127,12 @@ class Board extends EventEmitter {
     });
   }
 
-  async connect({ port = undefined, options = undefined } = {}) {
+  async __connectToBoard(port, options) {
     return new Promise(async (res, rej) => {
       try {
-        //if already connected return with success only if is called
-        //in auto-connect mode or if the port is the same connected
-        if (this.connected) {
-          //auto-connect mode
-          if (port === undefined) {
-            res(true);
-            return;
-          }
-          //if the port is the same
-          if (port === this.port) {
-            res(true);
-            return;
-          }
-          rej(`Connection Failed. Already connected on ${this.port}`);
-          return;
-        }
-
-        let __port = undefined;
-
-        //find a valid port
-        if (port === undefined) {
-          const portInfo = await this.requestPort();
-          __port = portInfo.path;
-        } else {
-          __port = port;
-        }
-
-        this.firmata = new Firmata(__port, options);
+        this.firmata = new Firmata(port, options);
         this.firmata.on("ready", () => {
           res(true);
-          return;
         });
         this.firmata.on("disconnect", this.__onDisconnect);
         this.firmata.on("close", this.__onClose);
@@ -168,9 +140,36 @@ class Board extends EventEmitter {
       } catch (e) {
         this.firmata = undefined;
         rej("Connection Failed. Check the hardware configuration");
-        return;
       }
     });
+  }
+
+  async connect({ port = undefined, options = undefined } = {}) {
+    try {
+      //if already connected return with success only if is called
+      //in auto-connect mode or if the port is the same connected
+      if (this.connected) {
+        if (port === undefined || port === this.port) {
+          return true;
+        }
+        throw (`Connection Failed. Already connected on ${this.port}`);
+      }
+
+      //connect to specified port or try auto-connect
+      let __port = undefined;
+      //find a valid port
+      if (port === undefined) {
+        const portInfo = await this.requestPort();
+        __port = portInfo.path;
+      } else {
+        __port = port;
+      }
+
+      await __connectToBoard(__port, options);
+    } catch (e) {
+      throw (e);
+    }
+    return true;
   }
 
   async disconnect() {
