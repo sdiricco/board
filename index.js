@@ -185,7 +185,7 @@ class Board extends EventEmitter {
         __port = port;
       }
 
-      await __connectBoard(__port, options);
+      await this.__connectBoard(__port, options);
     } catch (e) {
       throw (e);
     }

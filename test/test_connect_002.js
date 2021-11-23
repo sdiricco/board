@@ -22,28 +22,21 @@ const{Board} = require('../index');
 let main = async () => {
   try {
     console.log(`--- TEST START ---`)
+    console.log(`Verify the functionallity of connect() method passing a valid port`)
 
-    console.log("call <constructor()> of Board class")
     const board = new Board();
 
-    console.log("listen on <error> event");
     board.on("error", (e) => {
       console.log(e);
     });
 
-    console.log("call <requestPort()> method")
     let port = await board.requestPort();
-    console.log(port)
+    console.log("result of requestPort():", port)
 
-    console.log(`call <connect({port: ${port.path}})> method with port received by requestPort() method`);
     const res = await board.connect({port: port.path});
-    console.log(res);
+    console.log("result of connect():", res);
 
-    console.log("get <firmata> property");
-    console.log(board.firmata)
-
-    console.log("get <connected> property");
-    console.log(board.connected)
+    console.log("<connected> property:", board.connected);
 
     console.log(`--- TEST PASSED: ${board.connected} ---`)
     console.log(`--- TEST END ---`)

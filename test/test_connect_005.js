@@ -40,11 +40,7 @@ let main = async () => {
     res = await board.connect();
     console.log(res);
 
-    console.log("get <firmata> property");
-    console.log(board.firmata);
-
-    console.log("get <connected> property");
-    console.log(board.connected);
+    console.log("get <connected> property", board.connected);
 
     console.log(`--- TEST PASSED: ${board.connected} ---`);
     console.log(`--- TEST END ---`);
