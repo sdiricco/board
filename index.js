@@ -16,6 +16,8 @@ class Board extends EventEmitter {
     this.__onDisconnect = this.__onDisconnect.bind(this);
     this.__onClose = this.__onClose.bind(this);
     this.__onError = this.__onError.bind(this);
+    this.__connectBoard = this.__connectBoard.bind(this)
+    this.__disconnectBoard = this.__disconnectBoard.bind(this)
     this.execProm = this.execProm.bind(this);
     this.requestPort = this.requestPort.bind(this);
     this.connect = this.connect.bind(this);
@@ -101,6 +103,38 @@ class Board extends EventEmitter {
     });
   }
 
+  async __connectBoard(port, options) {
+    return new Promise(async (res, rej) => {
+      try {
+        this.firmata = new Firmata(port, options);
+        this.firmata.on("ready", () => {
+          res(true);
+        });
+        this.firmata.on("disconnect", this.__onDisconnect);
+        this.firmata.on("close", this.__onClose);
+        this.firmata.on("error", this.__onError);
+      } catch (e) {
+        this.firmata = undefined;
+        rej("Connection Failed. Check the hardware configuration");
+      }
+    });
+  }
+
+  async __disconnectBoard() {
+    return new Promise((res, rej) => {
+      if (!(this.firmata instanceof Firmata)) {
+        res(true);
+      }
+      this.firmata.off("disconnect", this.__onDisconnect);
+      this.firmata.off("close", this.__onClose);
+      this.firmata.off("error", this.__onError);
+      this.firmata.transport.close((e) => {
+        this.firmata = undefined;
+        e ? rej(e) : res(true);
+      });
+    });
+  }
+
   async execProm(__function, timeout = TIMEOUT_EXEC_PROM) {
     return new Promise(async (res, rej) => {
       setTimeout(() => {
@@ -127,27 +161,12 @@ class Board extends EventEmitter {
     });
   }
 
-  async __connectToBoard(port, options) {
-    return new Promise(async (res, rej) => {
-      try {
-        this.firmata = new Firmata(port, options);
-        this.firmata.on("ready", () => {
-          res(true);
-        });
-        this.firmata.on("disconnect", this.__onDisconnect);
-        this.firmata.on("close", this.__onClose);
-        this.firmata.on("error", this.__onError);
-      } catch (e) {
-        this.firmata = undefined;
-        rej("Connection Failed. Check the hardware configuration");
-      }
-    });
-  }
-
   async connect({ port = undefined, options = undefined } = {}) {
     try {
-      //if already connected return with success only if is called
-      //in auto-connect mode or if the port is the same connected
+
+      //if already connected, connect() return true 
+      //only if is called in auto-connect mode (port = undefined)
+      //or if the port is the same connected (port === this.port)
       if (this.connected) {
         if (port === undefined || port === this.port) {
           return true;
@@ -155,17 +174,18 @@ class Board extends EventEmitter {
         throw (`Connection Failed. Already connected on ${this.port}`);
       }
 
-      //connect to specified port or try auto-connect
       let __port = undefined;
-      //find a valid port
+
+      //connect to specified port or try auto-connect if port = undefined
       if (port === undefined) {
+        //in auto-connect mode find a valid port
         const portInfo = await this.requestPort();
-        __port = portInfo.path;
+        __port = portInfo ? portInfo.path : undefined;
       } else {
         __port = port;
       }
 
-      await __connectToBoard(__port, options);
+      await __connectBoard(__port, options);
     } catch (e) {
       throw (e);
     }
@@ -173,18 +193,14 @@ class Board extends EventEmitter {
   }
 
   async disconnect() {
-    return new Promise((res, rej) => {
+    try {
       if (!(this.firmata instanceof Firmata)) {
-        res(true);
+        return true;
       }
-      this.firmata.off("disconnect", this.__onDisconnect);
-      this.firmata.off("close", this.__onClose);
-      this.firmata.off("error", this.__onError);
-      this.firmata.transport.close((e) => {
-        this.firmata = undefined;
-        e ? rej(e) : res(true);
-      });
-    });
+      await this.__disconnectBoard();
+    } catch (e) {
+      throw(`Disconnection Failed. ${e.message}`)
+    }
   }
 
   async reset() {
