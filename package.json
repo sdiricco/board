@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --runInBand"
+    "test": "jest --runInBand",
+    "test-2": "node ./test/test_connect_001 && node ./test/test_connect_002"
   },
   "keywords": [],
   "author": "",

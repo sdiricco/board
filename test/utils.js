@@ -19,7 +19,8 @@ class Test {
 
         this.success = "\x1b[30m\x1b[42m%s\x1b[0m";
         this.error = "\x1b[30m\x1b[41m%s\x1b[0m";
-        this.title =  "\x1b[30m\x1b[46m%s\x1b[0m";
+        this.title =  "\x1b[30m\x1b[47m%s\x1b[0m";
+        this.footer =  "\x1b[30m\x1b[47cm%s\x1b[0m";
         this.bg =  "\x1b[46m%s\x1b[0m";
 
         this.name = __name;
@@ -30,10 +31,10 @@ class Test {
     }
 
     header(){
-        const countTitle = this.message.length > this.name.length ? this.message.length - this.name.length : 0;
-        const countMessage = this.name.length > this.message.length ? this.name.length - this.message.length : 0;
-        console.log(this.title, " " + this.name + " ".repeat(countTitle) + " ")
-        console.log(this.title, " " + this.message + " ".repeat(countMessage) + " ")
+        const title = `Test "${this.name}" start.`
+        console.log("--- ".repeat(20));
+        console.log(this.title, " " + title +  " ")
+        console.log(this.title, " " + this.message + " ")
     }
 
     assert(condition){
@@ -43,6 +44,8 @@ class Test {
         else{
             console.log(this.error, ` Test "${this.name}" failed \u{2716} `);
         }
+        console.log('\n')
+
     }
 }
 

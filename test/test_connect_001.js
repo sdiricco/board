@@ -42,8 +42,8 @@ let main = async () => {
     console.log("error catched:", e);
   }
 
-  test.assert(board.connected)
-  process.exit();
+  test.assert(board.connected);
+  process.exit()
 }
 
 main();

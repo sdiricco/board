@@ -18,7 +18,7 @@
  */
 
 const { Board } = require("../index");
-const { assert, Test } = require("./utils");
+const { Test } = require("./utils");
 
 let main = async () => {
 
