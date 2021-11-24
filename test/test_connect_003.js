@@ -3,7 +3,7 @@
  *
  * scope of test:
  * Verify the functionallity of connect() method
- * passing a invalid port parameter
+ * passing an invalid port parameter
  * 
  * prerequisites:
  * - a board with a valid firmata.ino firmware connected
@@ -17,32 +17,34 @@
  */
 
 const{Board} = require('../index');
+const { Test } = require("./utils");
 
 let main = async () => {
-  let board = undefined;
+
+  const test = new Test(
+    module.filename,
+    "Verify the functionallity of connect() method passing an invalid port parameter"
+  );
+
+  const board = new Board();
+
   try {
-    console.log(`--- TEST START ---`);
-
-    console.log("call <constructor()> of Board class");
-    board = new Board();
-
-    console.log("listen on <error> event");
     board.on("error", (e)=> {
-      console.log(e)
+      console.log("error event:", e)
     })
 
-    console.log(`call <connect({port: "unknow" })> method with with invalid port`);
     const res = await board.connect({port: "unknow"});
-    console.log(res);
+    console.log("result of connect():", res);
+
+    console.log("<connected> property: ", board.connected);
 
   } catch (e) {
-    console.log(e);
+    console.log("error catched:", e);
   }
 
-  console.log("get <connected> property", board.connected);
+  test.assert(!board.connected)
+  process.exit()
   
-  console.log(`--- TEST PASSED: ${!board.connected} ---`);
-  console.log(`--- TEST END ---`);
 };
 
 main();

@@ -16,30 +16,34 @@
  */
 
 const{Board} = require('../index');
-
+const { Test } = require("./utils");
 
 let main = async () => {
-  try {
-    console.log(`--- TEST START---`)
-    console.log(`Verify the functionallity of connect() method in auto-connect mode`)
 
-    const board = new Board();
+  const test = new Test(
+    module.filename,
+    "Verify the functionallity of connect() method in auto-connect mode"
+  );
+
+  const board = new Board();
+
+  try {
 
     board.on("error", (e) => {
-      console.log(e);
+      console.log("error event:", e)
     });
 
     const res = await board.connect();
     console.log("result of connect():", res);
 
     console.log("<connected> property:", board.connected);
-
-    console.log(`--- TEST PASSED: ${board.connected} ---`)
-    console.log(`--- TEST END ---`)
     
   } catch (e) {
-    console.log(e)
+    console.log("error catched:", e);
   }
+
+  test.assert(board.connected)
+  process.exit();
 }
 
 main();

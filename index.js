@@ -110,12 +110,12 @@ class Board extends EventEmitter {
         this.firmata.on("ready", () => {
           res(true);
         });
-        this.firmata.on("disconnect", this.__onDisconnect);
-        this.firmata.on("close", this.__onClose);
-        this.firmata.on("error", this.__onError);
+        this.firmata.on("error", (e)=>{
+          rej(e.message)
+        });
       } catch (e) {
         this.firmata = undefined;
-        rej("Connection Failed. Check the hardware configuration");
+        rej("Check the hardware configuration");
       }
     });
   }
@@ -125,9 +125,6 @@ class Board extends EventEmitter {
       if (!(this.firmata instanceof Firmata)) {
         res(true);
       }
-      this.firmata.off("disconnect", this.__onDisconnect);
-      this.firmata.off("close", this.__onClose);
-      this.firmata.off("error", this.__onError);
       this.firmata.transport.close((e) => {
         this.firmata = undefined;
         e ? rej(e) : res(true);
@@ -138,7 +135,7 @@ class Board extends EventEmitter {
   async execProm(__function, timeout = TIMEOUT_EXEC_PROM) {
     return new Promise(async (res, rej) => {
       setTimeout(() => {
-        rej(new Error("TIMEOUT EXPIRED"));
+        rej("Timeout Expired");
       }, timeout);
       try {
         __function();
@@ -156,7 +153,7 @@ class Board extends EventEmitter {
   async requestPort() {
     return new Promise((res, rej) => {
       Firmata.requestPort((e, port) => {
-        e ? rej(e) : res(port);
+        e ? rej(e.message) : res(port);
       });
     });
   }
@@ -186,8 +183,12 @@ class Board extends EventEmitter {
       }
 
       await this.__connectBoard(__port, options);
+
+      this.firmata.on("disconnect", this.__onDisconnect);
+      this.firmata.on("close", this.__onClose);
+      this.firmata.on("error", this.__onError);
     } catch (e) {
-      throw (e);
+      throw (`Connection Failed. ${e}`);
     }
     return true;
   }
@@ -197,6 +198,9 @@ class Board extends EventEmitter {
       if (!(this.firmata instanceof Firmata)) {
         return true;
       }
+      this.firmata.off("disconnect", this.__onDisconnect);
+      this.firmata.off("close", this.__onClose);
+      this.firmata.off("error", this.__onError);
       await this.__disconnectBoard();
     } catch (e) {
       throw(`Disconnection Failed. ${e.message}`)
@@ -212,7 +216,7 @@ class Board extends EventEmitter {
         }
       }, 50);
     } catch (e) {
-      throw `reset failed. Details: ${e.message}`;
+      throw `reset failed. Details: ${e}`;
     }
   }
 

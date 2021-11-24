@@ -6,7 +6,7 @@
  * in auto-connect mode calling it twice
  *
  * prerequisites:
- * - no board connected
+ * - a board with a valid firmata.ino firmware connected
  *
  * description step:
  * - call <constructor()> of Board class
@@ -18,35 +18,35 @@
  */
 
 const { Board } = require("../index");
+const { assert, Test } = require("./utils");
 
 let main = async () => {
-  let board = undefined;
+
+  const test = new Test(
+    module.filename,
+    "Verify the functionallity of connect() method in auto-connect mode calling it twice"
+  );
+
+  const board = new Board();
+
   try {
-    console.log(`--- TEST START ---`);
-
-    console.log("call <constructor()> of Board class");
-    board = new Board();
-
-    console.log("listen on <error> event");
     board.on("error", (e) => {
       console.log(e);
     });
 
-    console.log(`call <connect()> method. Autoconnect mode.`);
     let res = await board.connect();
-    console.log(res);
+    console.log("result of connect():", res);
 
-    console.log(`call <connect()> method. Autoconnect mode.`);
     res = await board.connect();
-    console.log(res);
+    console.log("result of connect():", res);
 
-    console.log("get <connected> property", board.connected);
-
-    console.log(`--- TEST PASSED: ${board.connected} ---`);
-    console.log(`--- TEST END ---`);
+    console.log("<connected> property:", board.connected);
   } catch (e) {
     console.log(e);
   }
+
+  test.assert(board.connected);
+  process.exit();
 };
 
 main();
