@@ -26,6 +26,7 @@ let main = async () => {
   );
 
   const board = new Board();
+  let isDone = false;
 
   try {
 
@@ -33,8 +34,9 @@ let main = async () => {
       console.log("error event:", e)
     });
 
-    const res = await board.connect();
-    console.log("result of connect():", res);
+    console.log("connecting..");
+    isDone = await board.connect();
+    console.log("connected");
 
     console.log("<connected> property:", board.connected);
     
@@ -42,7 +44,7 @@ let main = async () => {
     console.log("error catched:", e);
   }
 
-  test.assert(board.connected);
+  test.assert(board.connected && isDone);
   process.exit()
 }
 

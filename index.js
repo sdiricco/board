@@ -81,7 +81,7 @@ class Board extends EventEmitter {
     this.emit("error", {
       type: "DISCONNECTED",
       message: `Board disconnected`,
-      details: `details...`,
+      details: `Check the hardware configuration`,
     });
   }
 
@@ -89,8 +89,8 @@ class Board extends EventEmitter {
     this.firmata = undefined;
     this.emit("error", {
       type: "CLOSE",
-      message: `Board disconnected. Check the hardware configuration`,
-      details: `details...`,
+      message: `Board disconnected.`,
+      details: `Check the hardware configuration`,
     });
   }
 

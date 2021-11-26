@@ -31,18 +31,19 @@ let main = async () => {
 
   try {
     board.on("error", (e) => {
-      console.log(e);
+      console.log("error event:", e);
     });
 
     let res = await board.connect();
     console.log("result of connect():", res);
 
+    console.log("connecting..");
     res = await board.connect();
+    console.log("connected");
     console.log("result of connect():", res);
 
-    console.log("<connected> property:", board.connected);
   } catch (e) {
-    console.log(e);
+    console.log("error catched:", e);
   }
 
   test.assert(board.connected);

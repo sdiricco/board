@@ -27,22 +27,26 @@ let main = async () => {
   );
 
   const board = new Board();
+  let errorRaised = false;
 
   try {
     board.on("error", (e)=> {
       console.log("error event:", e)
     })
 
+    console.log("connecting..");
     const res = await board.connect({port: "unknow"});
+    console.log("connected");
     console.log("result of connect():", res);
 
-    console.log("<connected> property: ", board.connected);
-
   } catch (e) {
+    if (e && e.includes("Connection Failed")) {
+      errorRaised = true;
+    }
     console.log("error catched:", e);
   }
 
-  test.assert(!board.connected)
+  test.assert(!board.connected && errorRaised)
   process.exit()
   
 };

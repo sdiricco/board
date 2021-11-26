@@ -19,30 +19,41 @@
 const{Board} = require('../index');
 const { Test } = require("./utils");
 
+const prompt = require('prompt-sync')();
+ 
+
 let main = async () => {
 
   const test = new Test(
     module.filename,
-    "Verify the functionallity of connect() method when no board connected"
+    "Verify the functionallity of connect() method when no board connected."
   );
 
+  prompt('Tester: disconnect the board and press Enter to continue the test');
+  console.log('ok')
+
   const board = new Board();
+  let errorRaised = false;
+
   try {
 
     board.on("error", (e)=> {
       console.log("error event:", e)
     })
 
+    console.log("connecting..");
     const res = await board.connect();
+    console.log("connected");
     console.log("result of connect():", res);
 
-    console.log("<connected> property:", board.connected);
-
   } catch (e) {
+    if (e && e.includes("Connection Failed")) {
+      errorRaised = true;
+    }
     console.log("error catched:", e);
   }  
 
-  test.assert(!board.connected);
+  test.assert(!board.connected && errorRaised);
   process.exit()
 };
 
