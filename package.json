@@ -1,12 +1,11 @@
 {
   "name": "@sdiricco/boardjs",
-  "version": "0.1.2",
+  "version": "0.2.3",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "jest --runInBand",
-    "test-2": "node ./test/test_connect_001 && node ./test/test_connect_002",
-    "publish": "npm publish --access public"
+    "test-2": "node ./test/test_connect_001 && node ./test/test_connect_002"
   },
   "keywords": [],
   "author": "",

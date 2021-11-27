@@ -15,8 +15,8 @@ class Board extends EventEmitter {
     this.__onDisconnect = this.__onDisconnect.bind(this);
     this.__onClose = this.__onClose.bind(this);
     this.__onError = this.__onError.bind(this);
-    this.__connectBoard = this.__connectBoard.bind(this)
-    this.__disconnectBoard = this.__disconnectBoard.bind(this)
+    this.__connectBoard = this.__connectBoard.bind(this);
+    this.__disconnectBoard = this.__disconnectBoard.bind(this);
     this.execProm = this.execProm.bind(this);
     this.requestPort = this.requestPort.bind(this);
     this.connect = this.connect.bind(this);
@@ -109,8 +109,8 @@ class Board extends EventEmitter {
         this.firmata.on("ready", () => {
           res(true);
         });
-        this.firmata.on("error", (e)=>{
-          rej(e.message)
+        this.firmata.on("error", (e) => {
+          rej(e.message);
         });
       } catch (e) {
         this.firmata = undefined;
@@ -135,17 +135,20 @@ class Board extends EventEmitter {
     return new Promise(async (res, rej) => {
       setTimeout(() => {
         rej("Timeout Expired");
+        return;
       }, timeout);
       try {
         __function();
         this.firmata.flushDigitalPorts();
       } catch (e) {
         rej(e);
+        return;
       }
       while (this.firmata.pending) {
         await wait(1);
       }
       res(true);
+      return;
     });
   }
 
@@ -159,15 +162,14 @@ class Board extends EventEmitter {
 
   async connect({ port = undefined, options = undefined } = {}) {
     try {
-
-      //if already connected, connect() return true 
+      //if already connected, connect() return true
       //only if is called in auto-connect mode (port = undefined)
       //or if the port is the same connected (port === this.port)
       if (this.connected) {
         if (port === undefined || port === this.port) {
           return true;
         }
-        throw (`Connection Failed. Already connected on ${this.port}`);
+        throw `Connection Failed. Already connected on ${this.port}`;
       }
 
       let __port = undefined;
@@ -187,7 +189,7 @@ class Board extends EventEmitter {
       this.firmata.on("close", this.__onClose);
       this.firmata.on("error", this.__onError);
     } catch (e) {
-      throw (`Connection Failed. ${e}`);
+      throw `Connection Failed. ${e}`;
     }
     return true;
   }
@@ -202,7 +204,7 @@ class Board extends EventEmitter {
       this.firmata.off("error", this.__onError);
       await this.__disconnectBoard();
     } catch (e) {
-      throw(`Disconnection Failed. ${e.message}`)
+      throw `Disconnection Failed. ${e.message}`;
     }
   }
 
@@ -239,14 +241,10 @@ class Board extends EventEmitter {
     }
   }
 
-  async digitalRead(pin) {
-    return new Promise((res, rej) => {
-      try {
-        this.firmata.digitalRead(pin, (value) => res(value));
-      } catch (e) {
-        rej(`digitalRead() failed. Details: ${e.message}`);
-      }
-    });
+  digitalRead(pin) {
+    if (this.pins && this.pins.length && pin < this.pins.length) {
+      return this.pins[pin].value
+    }
   }
 }
 
