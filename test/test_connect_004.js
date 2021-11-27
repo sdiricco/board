@@ -12,14 +12,16 @@
  * - call <constructor()> of Board class
  * - listen on <error> event
  * - call <connect()> method. Autoconnect mode.
- * - get <firmata> property
- * - get <connected> property
+ * 
+ * Asserts: 
+ * - connected property
+ * - error catched
  */
 
 const{Board} = require('../index');
 const { Test } = require("./utils");
-
-const prompt = require('prompt-sync')();
+const prompt = require('prompt');
+prompt.start();
  
 
 let main = async () => {
@@ -29,16 +31,16 @@ let main = async () => {
     "Verify the functionallity of connect() method when no board connected."
   );
 
-  prompt('Tester: disconnect the board and press Enter to continue the test');
-  console.log('ok')
+  await prompt.get('Tester: disconnect the board and press Enter to continue the test');
 
   const board = new Board();
   let errorRaised = false;
+  let errorMessage = "";
 
   try {
 
     board.on("error", (e)=> {
-      console.log("error event:", e)
+      console.log("error raised:", e)
     })
 
     console.log("connecting..");
@@ -48,13 +50,16 @@ let main = async () => {
 
   } catch (e) {
     if (e && e.includes("Connection Failed")) {
+      errorMessage = e;
       errorRaised = true;
     }
     console.log("error catched:", e);
   }  
 
-  test.assert(!board.connected && errorRaised);
-  process.exit()
+  test.assert(!board.connected, "connected property");
+  test.assert(errorRaised, `error catched: ${errorMessage}`);
+  test.end({exit: true});
+
 };
 
 main();

@@ -1,5 +1,4 @@
 const Firmata = require("firmata");
-const SerialPort = require("serialport");
 const EventEmitter = require("events");
 
 const TIMEOUT_EXEC_PROM = 5;
@@ -251,4 +250,4 @@ class Board extends EventEmitter {
   }
 }
 
-module.exports = { Board, Firmata, SerialPort };
+module.exports = { Board, Firmata };

@@ -1,20 +1,20 @@
 /**
- * test002.js
  *
- * scope of test:
+ * Scope of test:
  * Verify the functionallity of connect() method
  * in auto-connect mode calling it twice
  *
- * prerequisites:
+ * Prerequisites:
  * - a board with a valid firmata.ino firmware connected
  *
- * description step:
+ * Description step:
  * - call <constructor()> of Board class
  * - listen on <error> event
  * - call <connect()> method. Autoconnect mode.
  * - call <connect()> method. Autoconnect mode.
- * - get <firmata> property
- * - get <connected> property
+ * 
+ * Asserts: 
+ * - connected property
  */
 
 const { Board } = require("../index");
@@ -31,7 +31,7 @@ let main = async () => {
 
   try {
     board.on("error", (e) => {
-      console.log("error event:", e);
+      console.log("error raised:", e);
     });
 
     let res = await board.connect();
@@ -46,8 +46,9 @@ let main = async () => {
     console.log("error catched:", e);
   }
 
-  test.assert(board.connected);
-  process.exit();
+  test.assert(board.connected, "connected property");
+  test.end({exit: true});
+
 };
 
 main();

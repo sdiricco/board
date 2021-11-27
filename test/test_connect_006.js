@@ -1,34 +1,26 @@
 /**
- * test003.js
  *
- * scope of test:
- * While the board is connected, verify that
- * if a user disconnect it from the usb port,
- * raise an error.
- * Check also the internal status
+ * Scope of test:
+ * Verify the functionallity of error event when
+ * the user disconnect a board already connected.
  *
- * prerequisites:
+ * Prerequisites:
  * - a board with a valid firmata.ino firmware connected
  *
- * description step:
- * - Tester: Connect a board with a valid firmata firmware
+ * Description step:
  * - call <constructor()> of Board class
  * - listen on <error> event
- * - call <requestPort()> method
- * - call <connect(${port.path})> method with port received by requestPort() method
- * - Tester: Disconnect the board. Wait 10000 ms..
- * - get <firmata> property
- * - get <connected> property
+ * - call <connect()> method with no parameters. auto-connect mode.
+ * - Tester: disconnect the board and press Enter to continue the test
+ * 
+ * Asserts: 
+ * - connected property
+ * - error catched
  */
 
 const { Board } = require("../index");
-const { Test } = require("./utils");
-var prompt = require('prompt');
+const { Test, prompt } = require("./utils");
 
-//
-// Start the prompt
-//
-prompt.start();
 
 let main = async () => {
   const test = new Test(
@@ -37,13 +29,16 @@ let main = async () => {
   );
 
   let board = undefined;
-  let eventRaised = false;
+  let errorRaised = false;
+  let errorMessage = "";
+
   try {
     board = new Board();
 
     board.on("error", (e) => {
       if (e && e.type === 'CLOSE') {
-        eventRaised = true;
+        errorMessage = e.message
+        errorRaised = true;
       }
       console.log("error event:", e);
     });
@@ -57,8 +52,9 @@ let main = async () => {
     console.log("error catched:", e);
   }
 
-  test.assert(!board.connected && eventRaised);
-  process.exit();
+  test.assert(!board.connected, "connected property");
+  test.assert(errorRaised, `error raised: ${errorMessage}`);
+  test.end({exit: true});
 };
 
 main();

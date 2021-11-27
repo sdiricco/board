@@ -1,22 +1,21 @@
 {
   "name": "@sdiricco/boardjs",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "jest --runInBand",
-    "test-2": "node ./test/test_connect_001 && node ./test/test_connect_002"
+    "test-2": "node ./test/test_connect_001 && node ./test/test_connect_002",
+    "publish": "npm publish --access public"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "firmata": "^2.3.0",
-    "serialport": "^9.2.5"
+    "firmata": "^2.3.0"
   },
   "devDependencies": {
     "jest": "^27.3.1",
-    "prompt": "^1.2.0",
-    "prompt-sync": "^4.2.0"
+    "prompt": "^1.2.0"
   }
 }

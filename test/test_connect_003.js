@@ -12,8 +12,10 @@
  * - call <constructor()> of Board class
  * - listen on <error> event
  * - call <connect({port: "unknow"})> method with with invalid port
- * - get <firmata> property
- * - get <connected> property
+ * 
+ * Asserts: 
+ * - connected property
+ * - error catched
  */
 
 const{Board} = require('../index');
@@ -28,10 +30,11 @@ let main = async () => {
 
   const board = new Board();
   let errorRaised = false;
+  let errorMessage = ""
 
   try {
     board.on("error", (e)=> {
-      console.log("error event:", e)
+      console.log("error raised:", e)
     })
 
     console.log("connecting..");
@@ -41,13 +44,15 @@ let main = async () => {
 
   } catch (e) {
     if (e && e.includes("Connection Failed")) {
+      errorMessage = e;
       errorRaised = true;
     }
     console.log("error catched:", e);
   }
 
-  test.assert(!board.connected && errorRaised)
-  process.exit()
+  test.assert(!board.connected, "connected property");
+  test.assert(errorRaised, `error catched: ${errorMessage}`);
+  test.end({exit: true});
   
 };
 

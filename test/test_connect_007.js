@@ -1,13 +1,12 @@
 /**
- * scope of test:
+ * Scope of test:
  * Verify the functionallity of connect() when the user 
  * disconnect the board, reconnect it and try a new connection.
  *
- * prerequisites:
+ * Prerequisites:
  * - a board with a valid firmata.ino firmware connected
  *
- * description step:
- * - Tester: Connect a board with a valid firmata firmware
+ * Description step:
  * - call <constructor()> of Board class
  * - listen on <error> event
  * - call <connect()> method with no parameters. auto-connect mode.
@@ -15,12 +14,12 @@
  * - Tester: connect the board and press Enter to continue the test
  * - call <connect()> method with no parameters. auto-connect mode.
  * 
- * Assert: board.connected
+ * Asserts: 
+ * - connected property
  */
 
 const { Board } = require("../index");
-const { Test } = require("./utils");
-const prompt = require('prompt');
+const { Test, prompt } = require("./utils");
 
 let main = async () => {
   let board = undefined;
@@ -44,9 +43,14 @@ let main = async () => {
     console.log("connecting..");
     await board.connect();
     console.log("connected");
+    test.assert(board.connected, "connected property true - 1");
+
     await prompt.get(
       "Tester: disconnect the board and press Enter to continue the test"
     );
+
+    test.assert(!board.connected, "connected property false - 2");
+
     await prompt.get(
       "Tester: connect the board and press Enter to continue the test"
     );
@@ -59,8 +63,9 @@ let main = async () => {
     console.log("error catched:", e);
   }
 
-  test.assert(board.connected);
-  process.exit();
+  test.assert(board.connected, "connected property true - 3");
+  test.end({exit: true});
+
 };
 
 main();
