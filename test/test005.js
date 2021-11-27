@@ -2,7 +2,7 @@
  * test005.js
  *
  * scope of test:
- * Verify the functionallity of connect()/disconnect() method.
+ * Verify the functionallity of disconnect() method.
  * First connect the board with connect() method, check the
  * internal status, then disconnect the board with disconnect()
  * method and check the internal status again

@@ -49,7 +49,7 @@ class Board extends EventEmitter {
 
   get pins() {
     if (!(this.firmata instanceof Firmata)) {
-      return undefined;
+      return [];
     }
     return this.firmata.pins;
   }
@@ -212,8 +212,8 @@ class Board extends EventEmitter {
     try {
       await this.execProm(() => {
         for (let pin = 0; pin < this.pins.length; pin++) {
-          this.pinMode(pin, this.MODES.UNKOWN);
-          this.digitalWrite(pin, this.LOW, true);
+          this.firmata.pinMode(pin, this.MODES.OUTPUT);
+          this.firmata.digitalWrite(pin, this.LOW, true);
         }
       }, 50);
     } catch (e) {
@@ -227,7 +227,7 @@ class Board extends EventEmitter {
         this.firmata.pinMode(pin, mode);
       });
     } catch (e) {
-      throw new Error(`pinMode() failed. Details: ${e}`);
+      throw new Error(`pinMode() failed. Details: ${e.message}`);
     }
   }
 
