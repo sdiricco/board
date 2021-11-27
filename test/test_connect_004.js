@@ -1,14 +1,13 @@
 /**
- * test002.js
  *
- * scope of test:
+ * Scope of test:
  * Verify the functionallity of connect() method
  * when no board connected
  * 
- * prerequisites:
+ * Prerequisites:
  * - no board connected
  *
- * description step:
+ * Description step:
  * - call <constructor()> of Board class
  * - listen on <error> event
  * - call <connect()> method. Autoconnect mode.
