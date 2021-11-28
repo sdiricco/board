@@ -24,6 +24,7 @@ class Board extends EventEmitter {
     this.pinMode = this.pinMode.bind(this);
     this.digitalWrite = this.digitalWrite.bind(this);
     this.digitalRead = this.digitalRead.bind(this);
+    this.reset = this.reset.bind(this);
   }
 
   get serialport() {
@@ -51,7 +52,7 @@ class Board extends EventEmitter {
     if (!(this.firmata instanceof Firmata)) {
       return [];
     }
-    return this.firmata.pins;
+    return this.firmata.pins
   }
 
   get MODES() {
@@ -108,13 +109,16 @@ class Board extends EventEmitter {
         this.firmata = new Firmata(port, options);
         this.firmata.on("ready", () => {
           res(true);
+          return;
         });
         this.firmata.on("error", (e) => {
           rej(e.message);
+          return;
         });
       } catch (e) {
         this.firmata = undefined;
         rej("Check the hardware configuration");
+        return;
       }
     });
   }
@@ -169,7 +173,7 @@ class Board extends EventEmitter {
         if (port === undefined || port === this.port) {
           return true;
         }
-        throw `Connection Failed. Already connected on ${this.port}`;
+        throw `Connection Failed. Already connected on ${this.port}, disconnect before`;
       }
 
       let __port = undefined;
@@ -183,11 +187,17 @@ class Board extends EventEmitter {
         __port = port;
       }
 
+
       await this.__connectBoard(__port, options);
+
+      this.firmata.off("disconnect", this.__onDisconnect);
+      this.firmata.off("close", this.__onClose);
+      this.firmata.off("error", this.__onError);
 
       this.firmata.on("disconnect", this.__onDisconnect);
       this.firmata.on("close", this.__onClose);
       this.firmata.on("error", this.__onError);
+
     } catch (e) {
       throw `Connection Failed. ${e}`;
     }
@@ -243,7 +253,7 @@ class Board extends EventEmitter {
 
   digitalRead(pin) {
     if (this.pins && this.pins.length && pin < this.pins.length) {
-      return this.pins[pin].value
+      return this.pins[pin].value;
     }
   }
 }

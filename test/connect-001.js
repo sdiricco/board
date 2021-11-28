@@ -40,7 +40,7 @@ let main = async () => {
     console.log("connecting..");
     __connect = await board.connect();
     console.log("connected");
-    
+
   } catch (e) {
     console.log("error catched:", e);
   }
