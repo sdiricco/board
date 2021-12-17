@@ -1,7 +1,7 @@
 const Firmata = require("firmata");
 const EventEmitter = require("events");
 
-const TIMEOUT_EXEC_PROM = 5;
+const TIMEOUT_EXEC_PROM_MS = 5;
 
 let wait = (t_ms) => {
   return new Promise((res) => setTimeout(() => res(true), t_ms));
@@ -17,6 +17,7 @@ class Board extends EventEmitter {
     this.__onError = this.__onError.bind(this);
     this.__connectBoard = this.__connectBoard.bind(this);
     this.__disconnectBoard = this.__disconnectBoard.bind(this);
+    
     this.execProm = this.execProm.bind(this);
     this.requestPort = this.requestPort.bind(this);
     this.connect = this.connect.bind(this);
@@ -135,7 +136,7 @@ class Board extends EventEmitter {
     });
   }
 
-  async execProm(__function, timeout = TIMEOUT_EXEC_PROM) {
+  async execProm(__function, timeout = TIMEOUT_EXEC_PROM_MS) {
     return new Promise(async (res, rej) => {
       setTimeout(() => {
         rej("Timeout Expired");
