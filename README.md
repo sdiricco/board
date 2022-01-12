@@ -1,4 +1,4 @@
-# boardjs
+# boardjss
 
 Implementation of firmatajs library based on Promise syntax with helpful extra functions.
 
